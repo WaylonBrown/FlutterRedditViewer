@@ -28,12 +28,13 @@ class PostList extends StatefulWidget {
 }
 
 class _PostListState extends State<PostList> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   List<Post> _postList;
 
-  void _incrementCounter() {
+  Future<void> _refresh() {
     print("Button clicked");
 
-    getPostList().then((postList) {
+    return getPostList().then((postList) {
       setState(() => _postList = postList);
       print(_postList);
     }).catchError((e) => print(e));
@@ -45,22 +46,19 @@ class _PostListState extends State<PostList> {
       appBar: AppBar(
         title: Text(widget.appBarTitle),
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(8.0),
-        itemExtent: 20.0,
-        itemCount: _postList?.length ?? 0,
-        itemBuilder: (BuildContext context, int index) {
-          return Text("${_postList.elementAt(index).title}");
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refresh,
+        child: ListView.builder(
+          padding: EdgeInsets.all(8.0),
+          itemExtent: 20.0,
+          itemCount: _postList?.length ?? 0,
+          itemBuilder: (BuildContext context, int index) {
+            return Text("${_postList.elementAt(index).title}");
+          },
+        )),
     );
   }
-
 }
 
 Future<List<Post>> getPostList() async {
