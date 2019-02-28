@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
 }
 
 class PostList extends StatefulWidget {
-  const PostList({Key key, this.appBarTitle}) : super(key: key);
-
   final String appBarTitle;
+
+  PostList({Key key, this.appBarTitle}) : super(key: key);
 
   @override
   _PostListState createState() => _PostListState();
@@ -42,6 +42,7 @@ class _PostListState extends State<PostList> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.appBarTitle),
@@ -58,6 +59,17 @@ class _PostListState extends State<PostList> {
           },
         )),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Trigger an initial refresh
+    WidgetsBinding.instance.addPostFrameCallback( (_) {
+      if (_postList == null || _postList.isEmpty) {
+        _refreshIndicatorKey.currentState.show();
+      }
+    });
   }
 }
 
