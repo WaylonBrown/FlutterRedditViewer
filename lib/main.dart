@@ -13,44 +13,42 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: PostList(appBarTitle: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key, this.title}) : super(key: key);
+class PostList extends StatefulWidget {
+  const PostList({Key key, this.appBarTitle}) : super(key: key);
 
-  final String title;
+  final String appBarTitle;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _PostListState createState() => _PostListState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _PostListState extends State<PostList> {
+//  int _counter = 0;
+  List<Post> _postList;
 
   void _incrementCounter() {
     print("Button clicked");
 
     setState(() {
-      _counter++;
+//      _counter++;
     });
 
-    var url = "https://www.reddit.com/hot.json";
-    http.get(url)
-        .then((response) {
-          var posts = parsePostResponse(response.body);
-          print("Type: ${posts.runtimeType}");
-          posts.forEach(print);
-        }).catchError((e) => print(e));
+    var postList = getPostList().then((postList) {
+      setState(() => _postList = postList);
+      print("Post list: $postList");
+    }).catchError((e) => print(e));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.appBarTitle),
       ),
       body: Center(
         child: Column(
@@ -58,11 +56,11 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Text(
               'Pull down to load content',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
+            )//,
+//            Text(
+//              '$_counter',
+//              style: Theme.of(context).textTheme.display1,
+//            ),
           ],
         ),
       ),
@@ -74,6 +72,34 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  parsePostResponse(String body) => convert
-      .jsonDecode(body)['data']['children'];
+}
+
+Future<List<Post>> getPostList() async {
+  try {
+    final response = await http.get("https://www.reddit.com/hot.json");
+    return Post.fromJsonToPostList(response.body);
+  } catch (e) {
+    print(e);
+    return null;
+  }
+}
+
+class Post {
+  final String title, message, subreddit, imageUrl;
+
+  // TODO: const?
+  Post(this.title, this.message, this.subreddit, this.imageUrl);
+
+  factory Post.fromJson(Map<String, dynamic> postJson) {
+    final postObject = postJson['data'];
+    return Post(postObject['title'], "", "", "");
+  }
+
+  static List<Post> fromJsonToPostList(String json) {
+    List<dynamic> rawPostList = convert.jsonDecode(json)['data']['children'];
+    List<Post> postList = List<Post>();
+    rawPostList.forEach((postMap) => postList.add(Post.fromJson((postMap as Map<String, dynamic>))));
+    return postList;
+  }
+
 }
