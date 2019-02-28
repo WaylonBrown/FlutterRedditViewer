@@ -28,19 +28,14 @@ class PostList extends StatefulWidget {
 }
 
 class _PostListState extends State<PostList> {
-//  int _counter = 0;
   List<Post> _postList;
 
   void _incrementCounter() {
     print("Button clicked");
 
-    setState(() {
-//      _counter++;
-    });
-
-    var postList = getPostList().then((postList) {
+    getPostList().then((postList) {
       setState(() => _postList = postList);
-      print("Post list: $postList");
+      print(_postList);
     }).catchError((e) => print(e));
   }
 
@@ -50,19 +45,13 @@ class _PostListState extends State<PostList> {
       appBar: AppBar(
         title: Text(widget.appBarTitle),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Pull down to load content',
-            )//,
-//            Text(
-//              '$_counter',
-//              style: Theme.of(context).textTheme.display1,
-//            ),
-          ],
-        ),
+      body: ListView.builder(
+        padding: EdgeInsets.all(8.0),
+        itemExtent: 20.0,
+        itemCount: _postList?.length ?? 0,
+        itemBuilder: (BuildContext context, int index) {
+          return Text("${_postList.elementAt(index).title}");
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
@@ -85,21 +74,24 @@ Future<List<Post>> getPostList() async {
 }
 
 class Post {
-  final String title, message, subreddit, imageUrl;
+  final String title, subreddit, imageUrl, url;
 
   // TODO: const?
-  Post(this.title, this.message, this.subreddit, this.imageUrl);
+  Post(this.title, this.subreddit, this.imageUrl, this.url);
 
+  // TODO: factory needed?
   factory Post.fromJson(Map<String, dynamic> postJson) {
     final postObject = postJson['data'];
-    return Post(postObject['title'], "", "", "");
+    return Post(postObject['title'],
+      postObject['subreddit_name_prefixed'],
+      postObject['thumbnail'],
+      postObject['url']);
   }
 
   static List<Post> fromJsonToPostList(String json) {
-    List<dynamic> rawPostList = convert.jsonDecode(json)['data']['children'];
-    List<Post> postList = List<Post>();
-    rawPostList.forEach((postMap) => postList.add(Post.fromJson((postMap as Map<String, dynamic>))));
+    final rawPostList = convert.jsonDecode(json)['data']['children'];
+    final postList = List<Post>();
+    rawPostList.forEach((postMap) => postList.add(Post.fromJson(postMap)));
     return postList;
   }
-
 }
