@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
+const PRIMARY_COLOR = Colors.teal;
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -11,9 +13,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: PRIMARY_COLOR,
       ),
-      home: PostList(appBarTitle: 'Flutter Demo Home Page'),
+      home: PostList(appBarTitle: 'Flutter Reddit Viewer'),
     );
   }
 }
@@ -52,10 +54,16 @@ class _PostListState extends State<PostList> {
         onRefresh: _refresh,
         child: ListView.builder(
           padding: EdgeInsets.all(8.0),
-          itemExtent: 20.0,
+//          itemExtent: 20.0,
           itemCount: _postList?.length ?? 0,
-          itemBuilder: (BuildContext context, int index) {
-            return Text("${_postList.elementAt(index).title}");
+          itemBuilder: (_, int index) {
+            return Card(
+                child: InkWell(
+                  splashColor: PRIMARY_COLOR.withAlpha(70),
+                  onTap: () { /* ... */ },
+                  child: Text("${_postList.elementAt(index).title}"),
+                )
+            );
           },
         )),
     );
