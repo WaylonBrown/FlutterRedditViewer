@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+import 'package:url_launcher/url_launcher.dart';
 
 const PRIMARY_COLOR = Colors.teal;
 
@@ -54,13 +55,12 @@ class _PostListState extends State<PostList> {
         onRefresh: _refresh,
         child: ListView.builder(
           padding: EdgeInsets.all(8.0),
-//          itemExtent: 20.0,
           itemCount: _postList?.length ?? 0,
           itemBuilder: (_, int index) {
             return Card(
                 child: InkWell(
                   splashColor: PRIMARY_COLOR.withAlpha(70),
-                  onTap: () { /* ... */ },
+                  onTap: () { launch(_postList.elementAt(index).url); },
                   child: Text("${_postList.elementAt(index).title}"),
                 )
             );
