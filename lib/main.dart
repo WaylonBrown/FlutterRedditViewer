@@ -94,13 +94,18 @@ class _PostListState extends State<PostList> {
       ));
     }
 
-    return Card(
-      child: InkWell(
-        splashColor: PRIMARY_COLOR.withAlpha(70),
-        onTap: () { launch(post.url); },
-        child: Column(children: columnChildren),
-      ),
-      elevation: 2.0,
+    return Column(
+      children: <Widget>[
+        Card(
+          child: InkWell(
+            splashColor: PRIMARY_COLOR.withAlpha(70),
+            onTap: () { launch(post.url); },
+            child: Column(children: columnChildren),
+          ),
+          elevation: 2.0,
+        ),
+        SizedBox(height: 4)
+      ],
     );
   }
 
@@ -108,7 +113,7 @@ class _PostListState extends State<PostList> {
     borderRadius: new BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
     child: SizedBox(
       width: double.infinity,
-      height: 200.0,
+      height: 250.0,
       child: child,
     ),
   );
@@ -190,6 +195,7 @@ class Post {
       postObject['domain']);
   }
 
+  // Use a higher quality image when possible
   static String getImageUrl(Map<String, dynamic> postObject) {
     String url = postObject['url'];
     if (url != null && url.isNotEmpty && (url.endsWith('.jpg')
