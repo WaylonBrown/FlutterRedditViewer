@@ -72,10 +72,7 @@ class _PostListState extends State<PostList> {
                 style: Theme.of(context).textTheme.title
               ),
               SizedBox(height: 8),
-              Text(
-                "By u/${post.author} to ${post.subreddit} at ${post.domain}",
-                style: Theme.of(context).textTheme.subhead
-              ),
+              getPostDescriptionText(post),
               SizedBox(height: 8),
               Row(
                 children: <Widget>[
@@ -114,6 +111,20 @@ class _PostListState extends State<PostList> {
       .timeout(const Duration(seconds: 5))
       .catchError((e) => print(e));
   }
+
+  getPostDescriptionText(Post post) => RichText(
+    text: new TextSpan(
+      style: Theme.of(context).textTheme.subhead,
+      children: <TextSpan>[
+        TextSpan(text: "By "),
+        TextSpan(text: "u/${post.author}", style: TextStyle(color: PRIMARY_COLOR)),
+        TextSpan(text: " to "),
+        TextSpan(text: "${post.subreddit}", style: TextStyle(color: PRIMARY_COLOR)),
+        TextSpan(text: " at "),
+        TextSpan(text: "${post.domain}", style: TextStyle(color: PRIMARY_COLOR))
+      ],
+    ),
+  );
 }
 
 Future<List<Post>> getPostList() async {
