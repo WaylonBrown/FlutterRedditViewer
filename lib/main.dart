@@ -177,17 +177,27 @@ class Post {
       imageUrl != "self" &&
       imageUrl != "default";
 
-  // TODO: factory needed?
   factory Post.fromJson(Map<String, dynamic> postJson) {
     final postObject = postJson['data'];
+    final imageUrl = getImageUrl(postObject);
     return Post(postObject['title'],
       postObject['author'],
       postObject['score'],
       postObject['num_comments'],
       postObject['subreddit_name_prefixed'],
-      postObject['thumbnail'],
+      imageUrl,
       postObject['url'],
       postObject['domain']);
+  }
+
+  static String getImageUrl(Map<String, dynamic> postObject) {
+    String url = postObject['url'];
+    if (url != null && url.isNotEmpty && (url.endsWith('.jpg')
+      || url.endsWith('.png'))) {
+      return url;
+    } else {
+      return postObject['thumbnail'];
+    }
   }
 
   static List<Post> fromJsonToPostList(String json) {
