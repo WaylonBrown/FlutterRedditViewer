@@ -37,10 +37,13 @@ class _PostListState extends State<PostList> {
   Future<void> _refresh() {
     print("Button clicked");
 
-    return getPostList().then((postList) {
-      setState(() => _postList = postList);
-      print(_postList);
-    }).catchError((e) => print(e));
+    return getPostList()
+      .then((postList) {
+        setState(() => _postList = postList);
+        print(_postList);
+      })
+      .timeout(const Duration(seconds: 5))
+      .catchError((e) => print(e));
   }
 
   @override
@@ -53,18 +56,28 @@ class _PostListState extends State<PostList> {
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _refresh,
-        child: ListView.builder(
-          padding: EdgeInsets.all(8.0),
-          itemCount: _postList?.length ?? 0,
-          itemBuilder: (_, int index) {
-            return Card(
-                child: InkWell(
-                  splashColor: PRIMARY_COLOR.withAlpha(70),
-                  onTap: () { launch(_postList.elementAt(index).url); },
-                  child: Text("${_postList.elementAt(index).title}"),
-                )
-            );
-          },
+        child: Container(
+          color: Colors.grey.shade300,
+          child: ListView.builder(
+            padding: EdgeInsets.all(8.0),
+            itemCount: _postList?.length ?? 0,
+            itemBuilder: (_, int index) {
+              return Card(
+                  child: InkWell(
+                    splashColor: PRIMARY_COLOR.withAlpha(70),
+                    onTap: () { launch(_postList.elementAt(index).url); },
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child:Text(
+                        "${_postList.elementAt(index).title}",
+                        style: Theme.of(context).textTheme.title
+                      ),
+                    ),
+                  ),
+                  elevation: 2.0,
+              );
+            },
+          )
         )),
     );
   }
@@ -82,13 +95,8 @@ class _PostListState extends State<PostList> {
 }
 
 Future<List<Post>> getPostList() async {
-  try {
-    final response = await http.get("https://www.reddit.com/hot.json");
-    return Post.fromJsonToPostList(response.body);
-  } catch (e) {
-    print(e);
-    return null;
-  }
+  final response = await http.get("https://www.reddit.com/hot.json");
+  return Post.fromJsonToPostList(response.body);
 }
 
 class Post {
