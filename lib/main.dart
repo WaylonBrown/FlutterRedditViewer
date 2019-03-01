@@ -50,24 +50,38 @@ class _PostListState extends State<PostList> {
             padding: EdgeInsets.all(8.0),
             itemCount: _postList?.length ?? 0,
             itemBuilder: (_, int index) {
-              return Card(
-                  child: InkWell(
-                    splashColor: PRIMARY_COLOR.withAlpha(70),
-                    onTap: () { launch(_postList.elementAt(index).url); },
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:Text(
-                        "${_postList.elementAt(index).title}",
-                        style: Theme.of(context).textTheme.title
-                      ),
-                    ),
-                  ),
-                  elevation: 2.0,
-              );
+              return getListItem(index);
             },
           )
         )),
     );
+
+  Widget getListItem(int index) {
+    final post = _postList.elementAt(index);
+    return Card(
+      child: InkWell(
+        splashColor: PRIMARY_COLOR.withAlpha(70),
+        onTap: () { launch(post.url); },
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                "${post.title}",
+                style: Theme.of(context).textTheme.title
+              ),
+              Text(
+                "By u/${post.author} to ${post.subreddit}",
+                style: Theme.of(context).textTheme.subhead
+              )
+            ],
+          )
+        ),
+      ),
+      elevation: 2.0,
+    );
+  }
 
   @override
   void initState() {
@@ -99,15 +113,16 @@ Future<List<Post>> getPostList() async {
 }
 
 class Post {
-  final String title, subreddit, imageUrl, url;
+  final String title, author, subreddit, imageUrl, url;
 
   // TODO: const?
-  Post(this.title, this.subreddit, this.imageUrl, this.url);
+  Post(this.title, this.author, this.subreddit, this.imageUrl, this.url);
 
   // TODO: factory needed?
   factory Post.fromJson(Map<String, dynamic> postJson) {
     final postObject = postJson['data'];
     return Post(postObject['title'],
+      postObject['author_fullname'],
       postObject['subreddit_name_prefixed'],
       postObject['thumbnail'],
       postObject['url']);
