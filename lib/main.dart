@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Reddit Flutter Viewer',
       theme: ThemeData(
         primarySwatch: PRIMARY_COLOR,
       ),
@@ -31,25 +31,13 @@ class PostList extends StatefulWidget {
 }
 
 class _PostListState extends State<PostList> {
+
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   List<Post> _postList;
 
-  Future<void> _refresh() {
-    print("Button clicked");
-
-    return getPostList()
-      .then((postList) {
-        setState(() => _postList = postList);
-        print(_postList);
-      })
-      .timeout(const Duration(seconds: 5))
-      .catchError((e) => print(e));
-  }
-
   @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
+  Widget build(BuildContext context) =>
+    Scaffold(
       appBar: AppBar(
         title: Text(widget.appBarTitle),
       ),
@@ -80,7 +68,6 @@ class _PostListState extends State<PostList> {
           )
         )),
     );
-  }
 
   @override
   void initState() {
@@ -91,6 +78,18 @@ class _PostListState extends State<PostList> {
         _refreshIndicatorKey.currentState.show();
       }
     });
+  }
+
+  Future<void> _refresh() {
+    print("Refresh triggered");
+
+    return getPostList()
+      .then((postList) {
+        setState(() => _postList = postList);
+        print(_postList);
+      })
+      .timeout(const Duration(seconds: 5))
+      .catchError((e) => print(e));
   }
 }
 
