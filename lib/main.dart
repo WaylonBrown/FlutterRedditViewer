@@ -63,26 +63,29 @@ class _PostListState extends State<PostList> {
     final post = _postList.elementAt(index);
     final verticalPadding = SizedBox(height: 8);
     var columnChildren = <Widget>[
-      Text(
-          "${post.title}",
-          style: Theme.of(context).textTheme.title
-      ),
-      verticalPadding,
-      getPostDescriptionText(post),
-      verticalPadding,
-      Row(
-        children: <Widget>[
-          Text("${post.commentCount} comments", style: TextStyle(fontWeight: FontWeight.bold)),
-          Text("${post.score} pts", style: TextStyle(fontWeight: FontWeight.bold))
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      )
-    ];
+      Padding(
+          padding: EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text("${post.title}", style: Theme.of(context).textTheme.title),
+              verticalPadding,
+              getPostDescriptionText(post),
+              verticalPadding,
+              Row(
+                children: <Widget>[
+                  Text("${post.commentCount} comments", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("${post.score} pts", style: TextStyle(fontWeight: FontWeight.bold))
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              )
+            ]
+          )
+      )];
 
     // TODO: If image doesn't work out, can add bold "text", "image", or "video" based
     // TODO: on this logic and is is_video
     if (post.hasImage()) {
-      columnChildren.insert(0, verticalPadding);
       columnChildren.insert(0, _sizedImageContainer(
         Image(image: CachedNetworkImageProvider(post.imageUrl,
         errorListener: () {
@@ -95,13 +98,7 @@ class _PostListState extends State<PostList> {
       child: InkWell(
         splashColor: PRIMARY_COLOR.withAlpha(70),
         onTap: () { launch(post.url); },
-        child: Padding(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: columnChildren
-          )
-        ),
+        child: Column(children: columnChildren),
       ),
       elevation: 2.0,
     );
@@ -110,7 +107,7 @@ class _PostListState extends State<PostList> {
   Widget _sizedImageContainer(Widget child) {
     return SizedBox(
       width: double.infinity,
-      height: 150.0,
+      height: 200.0,
       child: child,
     );
   }
