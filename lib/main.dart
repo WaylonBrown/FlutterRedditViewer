@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 const PRIMARY_COLOR = Colors.teal;
 
@@ -58,6 +59,29 @@ class _PostListState extends State<PostList> {
 
   Widget getListItem(int index) {
     final post = _postList.elementAt(index);
+    var children = <Widget>[
+      Text(
+          "${post.title}",
+          style: Theme.of(context).textTheme.title
+      ),
+      SizedBox(height: 8),
+      getPostDescriptionText(post),
+      SizedBox(height: 8),
+      Row(
+        children: <Widget>[
+          Text("${post.commentCount} comments"),
+          Text("${post.score} pts")
+        ],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      )
+    ];
+
+    if (post.imageUrl != null && !post.imageUrl.isEmpty && post.imageUrl != "self" && post.imageUrl != "default") {
+      children.insert(0, _sizedContainer(
+        Image(image: CachedNetworkImageProvider(post.imageUrl)),
+      ));
+    }
+
     return Card(
       child: InkWell(
         splashColor: PRIMARY_COLOR.withAlpha(70),
@@ -66,28 +90,37 @@ class _PostListState extends State<PostList> {
           padding: EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                "${post.title}",
-                style: Theme.of(context).textTheme.title
-              ),
-              SizedBox(height: 8),
-              getPostDescriptionText(post),
-              SizedBox(height: 8),
-              Row(
-                children: <Widget>[
-                  Text("${post.commentCount} comments"),
-                  Text("${post.score} pts")
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              )
-            ],
+            children: children
           )
         ),
       ),
       elevation: 2.0,
     );
   }
+
+  Widget _sizedContainer(Widget child) {
+    return new SizedBox(
+      width: 300.0,
+      height: 150.0,
+      child: new Center(
+        child: child,
+      ),
+    );
+  }
+
+  Widget getPostDescriptionText(Post post) => RichText(
+    text: new TextSpan(
+      style: Theme.of(context).textTheme.subhead,
+      children: <TextSpan>[
+        TextSpan(text: "By "),
+        TextSpan(text: "u/${post.author}", style: TextStyle(color: PRIMARY_COLOR)),
+        TextSpan(text: " to "),
+        TextSpan(text: "${post.subreddit}", style: TextStyle(color: PRIMARY_COLOR)),
+        TextSpan(text: " at "),
+        TextSpan(text: "${post.domain}", style: TextStyle(color: PRIMARY_COLOR))
+      ],
+    ),
+  );
 
   @override
   void initState() {
@@ -111,20 +144,6 @@ class _PostListState extends State<PostList> {
       .timeout(const Duration(seconds: 5))
       .catchError((e) => print(e));
   }
-
-  getPostDescriptionText(Post post) => RichText(
-    text: new TextSpan(
-      style: Theme.of(context).textTheme.subhead,
-      children: <TextSpan>[
-        TextSpan(text: "By "),
-        TextSpan(text: "u/${post.author}", style: TextStyle(color: PRIMARY_COLOR)),
-        TextSpan(text: " to "),
-        TextSpan(text: "${post.subreddit}", style: TextStyle(color: PRIMARY_COLOR)),
-        TextSpan(text: " at "),
-        TextSpan(text: "${post.domain}", style: TextStyle(color: PRIMARY_COLOR))
-      ],
-    ),
-  );
 }
 
 Future<List<Post>> getPostList() async {
