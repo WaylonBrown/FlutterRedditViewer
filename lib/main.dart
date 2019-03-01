@@ -59,7 +59,7 @@ class _PostListState extends State<PostList> {
 
   Widget getListItem(int index) {
     final post = _postList.elementAt(index);
-    var children = <Widget>[
+    var columnChildren = <Widget>[
       Text(
           "${post.title}",
           style: Theme.of(context).textTheme.title
@@ -76,9 +76,17 @@ class _PostListState extends State<PostList> {
       )
     ];
 
-    if (post.imageUrl != null && !post.imageUrl.isEmpty && post.imageUrl != "self" && post.imageUrl != "default") {
-      children.insert(0, _sizedContainer(
-        Image(image: CachedNetworkImageProvider(post.imageUrl)),
+    // TODO: If image doesn't work out, can add bold "text", "image", or "video" based
+    // TODO: on this logic and is is_video
+    if (post.imageUrl != null &&
+        post.imageUrl.isNotEmpty &&
+        post.imageUrl != "self" &&
+        post.imageUrl != "default") {
+      columnChildren.insert(0, _sizedImageContainer(
+        Image(image: CachedNetworkImageProvider(post.imageUrl,
+        errorListener: () {
+          columnChildren.removeAt(0);
+        })),
       ));
     }
 
@@ -90,7 +98,7 @@ class _PostListState extends State<PostList> {
           padding: EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: children
+            children: columnChildren
           )
         ),
       ),
@@ -98,11 +106,11 @@ class _PostListState extends State<PostList> {
     );
   }
 
-  Widget _sizedContainer(Widget child) {
-    return new SizedBox(
-      width: 300.0,
+  Widget _sizedImageContainer(Widget child) {
+    return SizedBox(
+      width: double.infinity,
       height: 150.0,
-      child: new Center(
+      child: Center(
         child: child,
       ),
     );
