@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 const PRIMARY_COLOR = Colors.teal;
 
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: PRIMARY_COLOR,
       ),
       home: PostList(appBarTitle: 'Flutter Reddit Viewer'),
+      debugShowCheckedModeBanner: false
     );
   }
 }
@@ -59,18 +61,19 @@ class _PostListState extends State<PostList> {
 
   Widget getListItem(int index) {
     final post = _postList.elementAt(index);
+    final verticalPadding = SizedBox(height: 8);
     var columnChildren = <Widget>[
       Text(
           "${post.title}",
           style: Theme.of(context).textTheme.title
       ),
-      SizedBox(height: 8),
+      verticalPadding,
       getPostDescriptionText(post),
-      SizedBox(height: 8),
+      verticalPadding,
       Row(
         children: <Widget>[
-          Text("${post.commentCount} comments"),
-          Text("${post.score} pts")
+          Text("${post.commentCount} comments", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text("${post.score} pts", style: TextStyle(fontWeight: FontWeight.bold))
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       )
@@ -78,10 +81,8 @@ class _PostListState extends State<PostList> {
 
     // TODO: If image doesn't work out, can add bold "text", "image", or "video" based
     // TODO: on this logic and is is_video
-    if (post.imageUrl != null &&
-        post.imageUrl.isNotEmpty &&
-        post.imageUrl != "self" &&
-        post.imageUrl != "default") {
+    if (post.hasImage()) {
+      columnChildren.insert(0, verticalPadding);
       columnChildren.insert(0, _sizedImageContainer(
         Image(image: CachedNetworkImageProvider(post.imageUrl,
         errorListener: () {
@@ -172,6 +173,11 @@ class Post {
     this.url,
     this.domain
   );
+
+  bool hasImage() => imageUrl != null &&
+      imageUrl.isNotEmpty &&
+      imageUrl != "self" &&
+      imageUrl != "default";
 
   // TODO: factory needed?
   factory Post.fromJson(Map<String, dynamic> postJson) {
