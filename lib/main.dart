@@ -86,7 +86,7 @@ class _PostListState extends State<PostList> {
         Image(image: CachedNetworkImageProvider(post.imageUrl,
         errorListener: () {
           columnChildren.removeAt(0);
-        })),
+        }), fit: BoxFit.fitWidth),
       ));
     }
 
@@ -110,9 +110,7 @@ class _PostListState extends State<PostList> {
     return SizedBox(
       width: double.infinity,
       height: 150.0,
-      child: Center(
-        child: child,
-      ),
+      child: child,
     );
   }
 
