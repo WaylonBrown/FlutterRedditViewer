@@ -63,7 +63,7 @@ class _PostListState extends State<PostList> {
         splashColor: PRIMARY_COLOR.withAlpha(70),
         onTap: () { launch(post.url); },
         child: Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -71,9 +71,18 @@ class _PostListState extends State<PostList> {
                 "${post.title}",
                 style: Theme.of(context).textTheme.title
               ),
+              SizedBox(height: 8),
               Text(
-                "By u/${post.author} to ${post.subreddit}",
+                "By u/${post.author} to ${post.subreddit} at ${post.domain}",
                 style: Theme.of(context).textTheme.subhead
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: <Widget>[
+                  Text("${post.commentCount} comments"),
+                  Text("${post.score} pts")
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
               )
             ],
           )
@@ -113,19 +122,32 @@ Future<List<Post>> getPostList() async {
 }
 
 class Post {
-  final String title, author, subreddit, imageUrl, url;
+  final String title, author, subreddit, imageUrl, url, domain;
+  final int score, commentCount;
 
   // TODO: const?
-  Post(this.title, this.author, this.subreddit, this.imageUrl, this.url);
+  Post(
+    this.title,
+    this.author,
+    this.score,
+    this.commentCount,
+    this.subreddit,
+    this.imageUrl,
+    this.url,
+    this.domain
+  );
 
   // TODO: factory needed?
   factory Post.fromJson(Map<String, dynamic> postJson) {
     final postObject = postJson['data'];
     return Post(postObject['title'],
-      postObject['author_fullname'],
+      postObject['author'],
+      postObject['score'],
+      postObject['num_comments'],
       postObject['subreddit_name_prefixed'],
       postObject['thumbnail'],
-      postObject['url']);
+      postObject['url'],
+      postObject['domain']);
   }
 
   static List<Post> fromJsonToPostList(String json) {
