@@ -86,7 +86,7 @@ class _PostListState extends State<PostList> {
     // TODO: If image doesn't work out, can add bold "text", "image", or "video" based
     // TODO: on this logic and is is_video
     if (post.hasImage()) {
-      columnChildren.insert(0, _sizedImageContainer(
+      columnChildren.insert(0, getImageContainer(
         Image(image: CachedNetworkImageProvider(post.imageUrl,
         errorListener: () {
           columnChildren.removeAt(0);
@@ -104,13 +104,14 @@ class _PostListState extends State<PostList> {
     );
   }
 
-  Widget _sizedImageContainer(Widget child) {
-    return SizedBox(
+  Widget getImageContainer(Widget child) => ClipRRect(
+    borderRadius: new BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
+    child: SizedBox(
       width: double.infinity,
       height: 200.0,
       child: child,
-    );
-  }
+    ),
+  );
 
   Widget getPostDescriptionText(Post post) => RichText(
     text: new TextSpan(
