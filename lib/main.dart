@@ -6,11 +6,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 const PRIMARY_COLOR = Colors.teal;
 
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -50,7 +48,7 @@ class _PostListState extends State<PostList> {
         child: Container(
           color: Colors.grey.shade300,
           child: ListView.builder(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(4.0),
             itemCount: _postList?.length ?? 0,
             itemBuilder: (_, int index) {
               return getListItem(index);
@@ -83,8 +81,6 @@ class _PostListState extends State<PostList> {
           )
       )];
 
-    // TODO: If image doesn't work out, can add bold "text", "image", or "video" based
-    // TODO: on this logic and is is_video
     if (post.hasImage()) {
       columnChildren.insert(0, getImageContainer(
         Image(image: CachedNetworkImageProvider(post.imageUrl,
@@ -104,7 +100,7 @@ class _PostListState extends State<PostList> {
           ),
           elevation: 2.0,
         ),
-        SizedBox(height: 4)
+        SizedBox(height: 2)
       ],
     );
   }
@@ -144,8 +140,6 @@ class _PostListState extends State<PostList> {
   }
 
   Future<void> _refresh() {
-    print("Refresh triggered");
-
     return getPostList()
       .then((postList) {
         setState(() => _postList = postList);
@@ -165,8 +159,7 @@ class Post {
   final String title, author, subreddit, imageUrl, url, domain;
   final int score, commentCount;
 
-  // TODO: const?
-  Post(
+  const Post(
     this.title,
     this.author,
     this.score,
