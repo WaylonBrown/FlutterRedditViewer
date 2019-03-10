@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 const PRIMARY_COLOR = Colors.teal;
+const TITLE = "Reddit Flutter Viewer";
 
 void main() => runApp(MyApp());
 
@@ -12,12 +13,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Reddit Flutter Viewer',
+      title: TITLE,
       theme: ThemeData(
-        primarySwatch: PRIMARY_COLOR,
+        primarySwatch: PRIMARY_COLOR
       ),
-      home: PostList(appBarTitle: 'Flutter Reddit Viewer'),
-      debugShowCheckedModeBanner: false
+      home: PostList(appBarTitle: TITLE)
     );
   }
 }
@@ -143,7 +143,6 @@ class _PostListState extends State<PostList> {
     return getPostList()
       .then((postList) {
         setState(() => _postList = postList);
-        print(_postList);
       })
       .timeout(const Duration(seconds: 5))
       .catchError((e) => print(e));
