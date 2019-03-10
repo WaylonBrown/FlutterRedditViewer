@@ -7,9 +7,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 const COLOR = Colors.teal;
 const TITLE = "Reddit Flutter Viewer";
 
-void main() => runApp(MyApp());
+void main() => runApp(App());
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext c) {
     return MaterialApp(
@@ -68,7 +68,7 @@ class PostListState extends State<PostList> {
             children: <Widget>[
               Text("${post.title}", style: Theme.of(context).textTheme.title),
               vPad,
-              getDescription(post),
+              getDesc(post),
               vPad,
               Row(
                 children: <Widget>[
@@ -114,7 +114,7 @@ class PostListState extends State<PostList> {
     ),
   );
 
-  Widget getDescription(Post p) => RichText(
+  Widget getDesc(Post p) => RichText(
     text: new TextSpan(
       style: Theme.of(context).textTheme.subhead,
       children: <TextSpan>[
@@ -140,16 +140,16 @@ class PostListState extends State<PostList> {
   }
 
   Future<void> refresh() {
-    return getPostList()
-      .then((postList) {
-        setState(() => posts = postList);
+    return getPosts()
+      .then((p) {
+        setState(() => posts = p);
       })
       .timeout(const Duration(seconds: 5))
       .catchError((e) => print(e));
   }
 }
 
-Future<List<Post>> getPostList() async {
+Future<List<Post>> getPosts() async {
   final response = await http.get("https://www.reddit.com/hot.json");
   return Post.fromJsonToPostList(response.body);
 }
