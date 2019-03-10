@@ -176,13 +176,12 @@ class Post {
 
   factory Post.fromJson(Map<String, dynamic> postJson) {
     final obj = postJson['data'];
-    final imageUrl = getImgUrl(obj);
     return Post(obj['title'],
       obj['author'],
       obj['score'],
       obj['num_comments'],
       obj['subreddit_name_prefixed'],
-      imageUrl,
+      getImgUrl(obj),
       obj['url'],
       obj['domain']);
   }
