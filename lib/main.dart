@@ -11,7 +11,7 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext c) {
     return MaterialApp(
       title: TITLE,
       theme: ThemeData(
@@ -28,15 +28,15 @@ class PostList extends StatefulWidget {
   PostList({Key key, this.title}) : super(key: key);
 
   @override
-  _PostListState createState() => _PostListState();
+  PostListState createState() => PostListState();
 }
 
-class _PostListState extends State<PostList> {
+class PostListState extends State<PostList> {
   final GlobalKey<RefreshIndicatorState> key = GlobalKey<RefreshIndicatorState>();
   List<Post> posts;
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext c) =>
     Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -49,16 +49,16 @@ class _PostListState extends State<PostList> {
           child: ListView.builder(
             padding: EdgeInsets.all(4.0),
             itemCount: posts?.length ?? 0,
-            itemBuilder: (_, int index) {
-              return getListItem(index);
+            itemBuilder: (_, int i) {
+              return getItem(i);
             },
           )
         )),
     );
 
-  Widget getListItem(int index) {
-    final post = posts.elementAt(index);
-    final vPadding = SizedBox(height: 8);
+  Widget getItem(int i) {
+    final post = posts.elementAt(i);
+    final vPad = SizedBox(height: 8);
     final bold = TextStyle(fontWeight: FontWeight.bold);
     var columnChildren = <Widget>[
       Padding(
@@ -67,9 +67,9 @@ class _PostListState extends State<PostList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text("${post.title}", style: Theme.of(context).textTheme.title),
-              vPadding,
+              vPad,
               getDescription(post),
-              vPadding,
+              vPad,
               Row(
                 children: <Widget>[
                   Text("${post.comCount} comments", style: bold),
@@ -114,16 +114,16 @@ class _PostListState extends State<PostList> {
     ),
   );
 
-  Widget getDescription(Post post) => RichText(
+  Widget getDescription(Post p) => RichText(
     text: new TextSpan(
       style: Theme.of(context).textTheme.subhead,
       children: <TextSpan>[
         TextSpan(text: "By "),
-        TextSpan(text: "u/${post.author}", style: TextStyle(color: COLOR)),
+        TextSpan(text: "u/${p.author}", style: TextStyle(color: COLOR)),
         TextSpan(text: " to "),
-        TextSpan(text: "${post.sub}", style: TextStyle(color: COLOR)),
+        TextSpan(text: "${p.sub}", style: TextStyle(color: COLOR)),
         TextSpan(text: " at "),
-        TextSpan(text: "${post.domain}", style: TextStyle(color: COLOR))
+        TextSpan(text: "${p.domain}", style: TextStyle(color: COLOR))
       ],
     ),
   );
@@ -174,8 +174,8 @@ class Post {
       imgUrl != "self" &&
       imgUrl != "default";
 
-  factory Post.fromJson(Map<String, dynamic> postJson) {
-    final obj = postJson['data'];
+  factory Post.fromJson(Map<String, dynamic> json) {
+    final obj = json['data'];
     return Post(obj['title'],
       obj['author'],
       obj['score'],
@@ -188,8 +188,8 @@ class Post {
 
   static List<Post> fromJsonToPostList(String json) {
     final posts = convert.jsonDecode(json)['data']['children'];
-    final postList = List<Post>();
-    posts.forEach((postMap) => postList.add(Post.fromJson(postMap)));
-    return postList;
+    final list = List<Post>();
+    posts.forEach((postMap) => list.add(Post.fromJson(postMap)));
+    return list;
   }
 }
