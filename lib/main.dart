@@ -83,10 +83,7 @@ class PostListState extends State<PostList> {
 
     if (post.hasImage()) {
       columnChildren.insert(0, getImgContainer(
-        Image(image: CachedNetworkImageProvider(post.imgUrl,
-        errorListener: () {
-          columnChildren.removeAt(0);
-        }), fit: BoxFit.fitWidth),
+        Image(image: CachedNetworkImageProvider(post.imgUrl), fit: BoxFit.fitWidth)
       ));
     }
 
