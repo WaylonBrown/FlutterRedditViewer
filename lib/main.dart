@@ -4,7 +4,7 @@ import 'dart:convert' as convert;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-const PRIMARY_COLOR = Colors.teal;
+const COLOR = Colors.teal;
 const TITLE = "Reddit Flutter Viewer";
 
 void main() => runApp(MyApp());
@@ -15,17 +15,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: TITLE,
       theme: ThemeData(
-        primarySwatch: PRIMARY_COLOR
+        primarySwatch: COLOR
       ),
-      home: PostList(appBarTitle: TITLE)
+      home: PostList(title: TITLE)
     );
   }
 }
 
 class PostList extends StatefulWidget {
-  final String appBarTitle;
+  final String title;
 
-  PostList({Key key, this.appBarTitle}) : super(key: key);
+  PostList({Key key, this.title}) : super(key: key);
 
   @override
   _PostListState createState() => _PostListState();
@@ -33,23 +33,23 @@ class PostList extends StatefulWidget {
 
 class _PostListState extends State<PostList> {
 
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  List<Post> _postList;
+  final GlobalKey<RefreshIndicatorState> key = GlobalKey<RefreshIndicatorState>();
+  List<Post> posts;
 
   @override
   Widget build(BuildContext context) =>
     Scaffold(
       appBar: AppBar(
-        title: Text(widget.appBarTitle),
+        title: Text(widget.title),
       ),
       body: RefreshIndicator(
-        key: _refreshIndicatorKey,
+        key: key,
         onRefresh: _refresh,
         child: Container(
           color: Colors.grey.shade300,
           child: ListView.builder(
             padding: EdgeInsets.all(4.0),
-            itemCount: _postList?.length ?? 0,
+            itemCount: posts?.length ?? 0,
             itemBuilder: (_, int index) {
               return getListItem(index);
             },
@@ -58,8 +58,9 @@ class _PostListState extends State<PostList> {
     );
 
   Widget getListItem(int index) {
-    final post = _postList.elementAt(index);
-    final verticalPadding = SizedBox(height: 8);
+    final post = posts.elementAt(index);
+    final vPadding = SizedBox(height: 8);
+    final bold = TextStyle(fontWeight: FontWeight.bold);
     var columnChildren = <Widget>[
       Padding(
           padding: EdgeInsets.all(12),
@@ -67,13 +68,13 @@ class _PostListState extends State<PostList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text("${post.title}", style: Theme.of(context).textTheme.title),
-              verticalPadding,
-              getPostDescriptionText(post),
-              verticalPadding,
+              vPadding,
+              getDescription(post),
+              vPadding,
               Row(
                 children: <Widget>[
-                  Text("${post.commentCount} comments", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text("${post.score} pts", style: TextStyle(fontWeight: FontWeight.bold))
+                  Text("${post.comCount} comments", style: bold),
+                  Text("${post.score} pts", style: bold)
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
               )
@@ -83,7 +84,7 @@ class _PostListState extends State<PostList> {
 
     if (post.hasImage()) {
       columnChildren.insert(0, getImageContainer(
-        Image(image: CachedNetworkImageProvider(post.imageUrl,
+        Image(image: CachedNetworkImageProvider(post.imgUrl,
         errorListener: () {
           columnChildren.removeAt(0);
         }), fit: BoxFit.fitWidth),
@@ -94,7 +95,7 @@ class _PostListState extends State<PostList> {
       children: <Widget>[
         Card(
           child: InkWell(
-            splashColor: PRIMARY_COLOR.withAlpha(70),
+            splashColor: COLOR.withAlpha(70),
             onTap: () { launch(post.url); },
             child: Column(children: columnChildren),
           ),
@@ -114,16 +115,16 @@ class _PostListState extends State<PostList> {
     ),
   );
 
-  Widget getPostDescriptionText(Post post) => RichText(
+  Widget getDescription(Post post) => RichText(
     text: new TextSpan(
       style: Theme.of(context).textTheme.subhead,
       children: <TextSpan>[
         TextSpan(text: "By "),
-        TextSpan(text: "u/${post.author}", style: TextStyle(color: PRIMARY_COLOR)),
+        TextSpan(text: "u/${post.author}", style: TextStyle(color: COLOR)),
         TextSpan(text: " to "),
-        TextSpan(text: "${post.subreddit}", style: TextStyle(color: PRIMARY_COLOR)),
+        TextSpan(text: "${post.sub}", style: TextStyle(color: COLOR)),
         TextSpan(text: " at "),
-        TextSpan(text: "${post.domain}", style: TextStyle(color: PRIMARY_COLOR))
+        TextSpan(text: "${post.domain}", style: TextStyle(color: COLOR))
       ],
     ),
   );
@@ -131,10 +132,10 @@ class _PostListState extends State<PostList> {
   @override
   void initState() {
     super.initState();
-    // Trigger an initial refresh
+    // Initial refresh
     WidgetsBinding.instance.addPostFrameCallback( (_) {
-      if (_postList == null || _postList.isEmpty) {
-        _refreshIndicatorKey.currentState.show();
+      if (posts == null || posts.isEmpty) {
+        key.currentState.show();
       }
     });
   }
@@ -142,7 +143,7 @@ class _PostListState extends State<PostList> {
   Future<void> _refresh() {
     return getPostList()
       .then((postList) {
-        setState(() => _postList = postList);
+        setState(() => posts = postList);
       })
       .timeout(const Duration(seconds: 5))
       .catchError((e) => print(e));
@@ -155,40 +156,40 @@ Future<List<Post>> getPostList() async {
 }
 
 class Post {
-  final String title, author, subreddit, imageUrl, url, domain;
-  final int score, commentCount;
+  final String title, author, sub, imgUrl, url, domain;
+  final int score, comCount;
 
   const Post(
     this.title,
     this.author,
     this.score,
-    this.commentCount,
-    this.subreddit,
-    this.imageUrl,
+    this.comCount,
+    this.sub,
+    this.imgUrl,
     this.url,
     this.domain
   );
 
-  bool hasImage() => imageUrl != null &&
-      imageUrl.isNotEmpty &&
-      imageUrl != "self" &&
-      imageUrl != "default";
+  bool hasImage() => imgUrl != null &&
+      imgUrl.isNotEmpty &&
+      imgUrl != "self" &&
+      imgUrl != "default";
 
   factory Post.fromJson(Map<String, dynamic> postJson) {
-    final postObject = postJson['data'];
-    final imageUrl = getImageUrl(postObject);
-    return Post(postObject['title'],
-      postObject['author'],
-      postObject['score'],
-      postObject['num_comments'],
-      postObject['subreddit_name_prefixed'],
+    final obj = postJson['data'];
+    final imageUrl = getImgUrl(obj);
+    return Post(obj['title'],
+      obj['author'],
+      obj['score'],
+      obj['num_comments'],
+      obj['subreddit_name_prefixed'],
       imageUrl,
-      postObject['url'],
-      postObject['domain']);
+      obj['url'],
+      obj['domain']);
   }
 
   // Use a higher quality image when possible
-  static String getImageUrl(Map<String, dynamic> postObject) {
+  static String getImgUrl(Map<String, dynamic> postObject) {
     String url = postObject['url'];
     if (url != null && url.isNotEmpty && (url.endsWith('.jpg')
       || url.endsWith('.png'))) {
@@ -199,9 +200,9 @@ class Post {
   }
 
   static List<Post> fromJsonToPostList(String json) {
-    final rawPostList = convert.jsonDecode(json)['data']['children'];
+    final posts = convert.jsonDecode(json)['data']['children'];
     final postList = List<Post>();
-    rawPostList.forEach((postMap) => postList.add(Post.fromJson(postMap)));
+    posts.forEach((postMap) => postList.add(Post.fromJson(postMap)));
     return postList;
   }
 }
