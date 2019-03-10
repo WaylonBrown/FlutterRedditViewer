@@ -82,8 +82,13 @@ class PostListState extends State<PostList> {
       )];
 
     if (post.hasImage()) {
-      columnChildren.insert(0, getImgContainer(
-        Image(image: CachedNetworkImageProvider(post.imgUrl), fit: BoxFit.fitWidth)
+      columnChildren.insert(0, ClipRRect(
+        borderRadius: new BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
+        child: SizedBox(
+          width: double.infinity,
+          height: 250.0,
+          child: Image(image: CachedNetworkImageProvider(post.imgUrl), fit: BoxFit.fitWidth),
+        ),
       ));
     }
 
@@ -101,15 +106,6 @@ class PostListState extends State<PostList> {
       ],
     );
   }
-
-  Widget getImgContainer(Widget child) => ClipRRect(
-    borderRadius: new BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
-    child: SizedBox(
-      width: double.infinity,
-      height: 250.0,
-      child: child,
-    ),
-  );
 
   Widget getDesc(Post p) => RichText(
     text: new TextSpan(
