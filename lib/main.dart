@@ -181,20 +181,9 @@ class Post {
       obj['score'],
       obj['num_comments'],
       obj['subreddit_name_prefixed'],
-      getImgUrl(obj),
+      obj['thumbnail'],
       obj['url'],
       obj['domain']);
-  }
-
-  // Use a higher quality image when possible
-  static String getImgUrl(Map<String, dynamic> postObject) {
-    String url = postObject['url'];
-    if (url != null && url.isNotEmpty && (url.endsWith('.jpg')
-      || url.endsWith('.png'))) {
-      return url;
-    } else {
-      return postObject['thumbnail'];
-    }
   }
 
   static List<Post> fromJsonToPostList(String json) {
