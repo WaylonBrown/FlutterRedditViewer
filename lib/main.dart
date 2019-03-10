@@ -32,7 +32,6 @@ class PostList extends StatefulWidget {
 }
 
 class _PostListState extends State<PostList> {
-
   final GlobalKey<RefreshIndicatorState> key = GlobalKey<RefreshIndicatorState>();
   List<Post> posts;
 
@@ -44,7 +43,7 @@ class _PostListState extends State<PostList> {
       ),
       body: RefreshIndicator(
         key: key,
-        onRefresh: _refresh,
+        onRefresh: refresh,
         child: Container(
           color: Colors.grey.shade300,
           child: ListView.builder(
@@ -83,7 +82,7 @@ class _PostListState extends State<PostList> {
       )];
 
     if (post.hasImage()) {
-      columnChildren.insert(0, getImageContainer(
+      columnChildren.insert(0, getImgContainer(
         Image(image: CachedNetworkImageProvider(post.imgUrl,
         errorListener: () {
           columnChildren.removeAt(0);
@@ -106,7 +105,7 @@ class _PostListState extends State<PostList> {
     );
   }
 
-  Widget getImageContainer(Widget child) => ClipRRect(
+  Widget getImgContainer(Widget child) => ClipRRect(
     borderRadius: new BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
     child: SizedBox(
       width: double.infinity,
@@ -140,7 +139,7 @@ class _PostListState extends State<PostList> {
     });
   }
 
-  Future<void> _refresh() {
+  Future<void> refresh() {
     return getPostList()
       .then((postList) {
         setState(() => posts = postList);
